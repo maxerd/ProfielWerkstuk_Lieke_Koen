@@ -18,14 +18,14 @@ class GUI:
         self.window.attributes('-fullscreen', self.fullScreen)
         self.frm = ttk.Frame(self.window, padding=10)
         self.frm.grid()
-        button = Button(self.window,
-            text="Quit",
-            width=25,
-            height=5,
-            fg='white',  # Set the text color to white
-            bg='red',  # Set the background color to black
-            command=quit
-        ).grid(column=99, row=99)
+        #button = Button(self.window,
+        #    text="Quit",
+        #    width=25,
+        #    height=5,
+        #    fg='white',  # Set the text color to white
+        #    bg='red',  # Set the background color to black
+        #    command=quit
+        #).grid(column=99, row=99)
 
     def addLabel(self,inText,gridPos,visuals):
         self.showText = inText
