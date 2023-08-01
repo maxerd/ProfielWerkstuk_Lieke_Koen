@@ -1,8 +1,22 @@
 from tkinter import *
 from tkinter import ttk
 import time
-import win32api
 
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
+from matplotlib.figure import Figure
+matplotlib.rcParams['toolbar'] = 'None'
+if matplotlib.get_backend() == 'Qt5Agg':
+    from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+    def _update_buttons_checked(self):
+        # sync button checkstates to match active mode (patched)
+        if 'pan' in self._actions:
+            self._actions['pan'].setChecked(self._active == 'PAN')
+        if 'zoom' in self._actions:
+            self._actions['zoom'].setChecked(self._active == 'ZOOM')
+    NavigationToolbar2QT._update_buttons_checked = _update_buttons_checked
 
 ###################################
 ##### GUI setup and functions #####
@@ -77,6 +91,72 @@ class GUI:
         ).grid(column=self.gridCollumn, row=self.gridRow)
         return value
 
+    def addGraph(self,X1,X2,X3,time,visuals):
+        #self.showText = inText
+        #self.gridCollumn = gridPos[0]
+        #self.gridRow = gridPos[1]
+
+        self.bgndColor = visuals[0]
+        self.fgndColor = visuals[1]
+
+        fize = (8,3)
+
+        f1 = Figure(figsize=fize, dpi=70)
+        x1 = f1.add_subplot(111)
+        x1.set_title('Position')
+        x1.set_ylabel('Mass position [m]')
+        x1.set_xlabel('Time [s]')
+        x1.plot(time,X1)
+        f2 = Figure(figsize=fize, dpi=70)
+        x2 = f2.add_subplot(111)
+        x2.set_title('Velocity')
+        x2.set_ylabel('Mass velocity [m/s]')
+        x2.set_xlabel('Time [s]')
+        x2.plot(time,X2)
+        f3 = Figure(figsize=fize, dpi=70)
+        x3 = f3.add_subplot(111)
+        x3.set_title('Acceleration')
+        x3.set_ylabel('Mass acceleration [m/s^2]')
+        x3.set_xlabel('Time [s]')
+        x3.plot(time,X3)
+
+        #x2 = f.add_subplot(312)
+        #x2.set_title('Velocity')
+        #x2.set_ylabel('Mass velocity [m/s]')
+        #x1.set_xlabel('Time [s]')
+        #x2.plot(time,X2)
+        #x3 = f.add_subplot(313)
+        #x3.set_title('Acceleration')
+        #x3.set_ylabel('Mass acceleration [m/s^2]')
+        #x1.set_xlabel('Time [s]')
+        #x3.plot(time,X3)
+        canvas1 = FigureCanvasTkAgg(f1, self.window)
+        canvas1.get_tk_widget().grid(row=0,column=4,columnspan=1,rowspan=2)
+        canvas1.draw()
+        canvas2 = FigureCanvasTkAgg(f2, self.window)
+        canvas2.get_tk_widget().grid(row=2,column=4,columnspan=1,rowspan=2)
+        canvas2.draw()
+        canvas3 = FigureCanvasTkAgg(f3, self.window)
+        canvas3.get_tk_widget().grid(row=4,column=4,columnspan=1,rowspan=2)
+        canvas3.draw()
+
+        toolbarFrame = Frame(self.window)
+        toolbarFrame.grid(row=22,column=4)
+        toolbar = NavigationToolbar2Tk(canvas1, toolbarFrame)
+        toolbar = NavigationToolbar2Tk(canvas2, toolbarFrame)
+        toolbar = NavigationToolbar2Tk(canvas3, toolbarFrame)
+        #canvas.show()
+        #canvas.get_tk_widget().pack()
+
+        #value = Entry(self.window,
+        #    text=self.showText,
+        #    #width=25,
+        #    #height=5,
+	    #    #command=self.execFunc,
+        #    fg=self.fgndColor,  # Set the text color to white
+        #    bg=self.bgndColor  # Set the background color to black
+        #).grid(column=self.gridCollumn, row=self.gridRow)
+
     def updt(self):
         self.window.update()
 
@@ -110,8 +190,6 @@ def plotDis(dis):
     print('\n Plotting distance measurement...')
     # Plot the (distance) measurement from here
     # The measurement data is a 2D matrix, X-axis data on the first row, Y-axis data on the second
-    # !!! Do not use the command below for actual code, it will crash the programm when used incorrectly with Tkinter !!!
-    win32api.MessageBox(0, 'The plotted data will be shown here probably', 'Measurement data')
 
 def passFunc():
     pass
@@ -185,6 +263,10 @@ stdVisuals = ['grey','black',False,'green','white']
 #############################################################################
 
 visuals = stdVisuals[0:6]
+teta = [2,4,8,14]
+omega = [0,2,4,6]
+alpha = [2,2,2,2]
+t = [1,2,3,4]
 
 mainScreen = GUI()
 mainScreen.genWindow(visuals,' ProfielWerkstuk')
@@ -192,11 +274,12 @@ mainScreen.addButton("Setup 1 start",[1,0],setup1,visuals)
 mainScreen.addButton("Setup 2 start",[2,0],setup2,visuals)
 mainScreen.addButton("Setup 3 start",[3,0],setup3,visuals)
 mainScreen.addButton("Setup 3 start",[3,1],setup3,visuals)
-mainScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
+#mainScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
+mainScreen.addGraph(teta,omega,alpha,t,visuals)
 
-graphScreen = GUI()
-graphScreen.genWindow(visuals,' Graphs')
-graphScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
+#graphScreen = GUI()
+#graphScreen.genWindow(visuals,' Graphs')
+#graphScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
 
-graphScreen.show()
+#graphScreen.show()
 mainScreen.show()
