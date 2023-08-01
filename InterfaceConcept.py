@@ -11,10 +11,10 @@ class GUI:
     def __init__(self):
         pass
 
-    def genWindow(self,visuals):
+    def genWindow(self,visuals,windowName):
         self.fullScreen = visuals[2]
 
-        self.window = Tk(className='Profielwerkstuk')
+        self.window = Tk(className=windowName)
         self.window.attributes('-fullscreen', self.fullScreen)
         self.frm = ttk.Frame(self.window, padding=10)
         self.frm.grid()
@@ -58,6 +58,24 @@ class GUI:
             fg=self.fgndColor,  # Set the text color to white
             bg=self.bgndColor  # Set the background color to black
         ).grid(column=self.gridCollumn, row=self.gridRow)
+
+    def addUserEntry(self,inText,gridPos,visuals):
+        self.showText = inText
+        self.gridCollumn = gridPos[0]
+        self.gridRow = gridPos[1]
+
+        self.bgndColor = visuals[0]
+        self.fgndColor = visuals[1]
+
+        value = Entry(self.window,
+            text=self.showText,
+            #width=25,
+            #height=5,
+	        #command=self.execFunc,
+            fg=self.fgndColor,  # Set the text color to white
+            bg=self.bgndColor  # Set the background color to black
+        ).grid(column=self.gridCollumn, row=self.gridRow)
+        return value
 
     def updt(self):
         self.window.update()
@@ -130,6 +148,22 @@ def setup2():
     visuals[0:2] = stdVisuals[0:2]
     mainScreen.addButton("Setup 2 start",[2,0],setup2,visuals)
 
+#########################################
+##### All functions for setup 3 --> #####
+#########################################
+def setup3():
+
+    visuals[0:2] = stdVisuals[3:5]
+    mainScreen.addButton("Taking measurement...",[3,0],passFunc,visuals)
+    mainScreen.updt()
+
+    ## Simple example for measurement
+    dis = measDis(2)
+    plotDis(dis)
+
+    visuals[0:2] = stdVisuals[0:2]
+    mainScreen.addButton("Setup 2 start",[3,0],setup3,visuals)
+
 
 ##########################################################################
 ##### Changes in the interface colors etc only to be done below here #####
@@ -153,10 +187,16 @@ stdVisuals = ['grey','black',False,'green','white']
 visuals = stdVisuals[0:6]
 
 mainScreen = GUI()
-mainScreen.genWindow(visuals)
-mainScreen.addLabel("greatest interface",[0,0],visuals)
+mainScreen.genWindow(visuals,' ProfielWerkstuk')
 mainScreen.addButton("Setup 1 start",[1,0],setup1,visuals)
 mainScreen.addButton("Setup 2 start",[2,0],setup2,visuals)
-mainScreen.addButton("Setup 3 start",[3,0],setup2,visuals)
-mainScreen.show()
+mainScreen.addButton("Setup 3 start",[3,0],setup3,visuals)
+mainScreen.addButton("Setup 3 start",[3,1],setup3,visuals)
+mainScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
 
+graphScreen = GUI()
+graphScreen.genWindow(visuals,' Graphs')
+graphScreen.addLabel("Graphs for students to see will be placed here",[0,0],visuals)
+
+graphScreen.show()
+mainScreen.show()
