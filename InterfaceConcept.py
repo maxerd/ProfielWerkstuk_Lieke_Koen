@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import time
+import VL53L0X
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -101,19 +102,19 @@ class GUI:
 
         fize = (8,3)
 
-        f1 = Figure(figsize=fize, dpi=70)
+        f1 = Figure(figsize=fize, dpi=60)
         x1 = f1.add_subplot(111)
         x1.set_title('Position')
         x1.set_ylabel('Mass position [m]')
         x1.set_xlabel('Time [s]')
         x1.plot(time,X1)
-        f2 = Figure(figsize=fize, dpi=70)
+        f2 = Figure(figsize=fize, dpi=60)
         x2 = f2.add_subplot(111)
         x2.set_title('Velocity')
         x2.set_ylabel('Mass velocity [m/s]')
         x2.set_xlabel('Time [s]')
         x2.plot(time,X2)
-        f3 = Figure(figsize=fize, dpi=70)
+        f3 = Figure(figsize=fize, dpi=60)
         x3 = f3.add_subplot(111)
         x3.set_title('Acceleration')
         x3.set_ylabel('Mass acceleration [m/s^2]')
@@ -134,10 +135,10 @@ class GUI:
         canvas1.get_tk_widget().grid(row=0,column=4,columnspan=1,rowspan=2)
         canvas1.draw()
         canvas2 = FigureCanvasTkAgg(f2, self.window)
-        canvas2.get_tk_widget().grid(row=2,column=4,columnspan=1,rowspan=2)
+        canvas2.get_tk_widget().grid(row=3,column=4,columnspan=1,rowspan=2)
         canvas2.draw()
         canvas3 = FigureCanvasTkAgg(f3, self.window)
-        canvas3.get_tk_widget().grid(row=4,column=4,columnspan=1,rowspan=2)
+        canvas3.get_tk_widget().grid(row=6,column=4,columnspan=1,rowspan=2)
         canvas3.draw()
 
         toolbarFrame = Frame(self.window)
@@ -166,16 +167,38 @@ class GUI:
 ############################################
 ##### General Functions for all setups #####
 ############################################
+
+# Create a VL53L0X object
+tof = VL53L0X.VL53L0X()
+
 def measDis(dur):
+    ## Begin of (distance) measurement code
+    # Start ranging
+    tof.start_ranging(VL53L0X.VL53L0X_BETTER_ACCURACY_MODE)
+    timing = tof.get_timing()
+
+    print('Taking new measurement...')
+    Ts = 0.001
+    
+    for count in range(1,(100)):
+        distance = tof.get_distance()
+    
+        if (distance > 0):
+            print ("%d mm, %d cm, %d" % (distance, (distance/10), count))
+
+        time.sleep(timing/1000000.00)
+        #   The measurement needs to output a 2D matrix, X-axis data on the first row, Y-axis data on the second
+        dat[count] = distance
+
+    tof.stop_ranging()
     print('Taking new measurement...')
 
-    ## Begin of (distance) measurement code
-    #   The measurement needs to output a 2D matrix, X-axis data on the first row, Y-axis data on the second
-
-    time.sleep(dur) #Measurement time placeholder
-    dat = [[10,9,8,7,6,5],[1,2,3,4,5,6]] #Measurement data placeholder
-
     ## End of measurement code
+
+    ## Old placeholder data
+    #time.sleep(dur) #Measurement time placeholder
+    #dat = [[10,9,8,7,6,5],[1,2,3,4,5,6]] #Measurement data placeholder
+    ## End of old placeholder data
 
     print('Measurement done')
     return dat
