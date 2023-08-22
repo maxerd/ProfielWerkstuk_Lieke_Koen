@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import time
 import VL53L0X
+from mpu6050 import mpu6050
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -202,6 +203,25 @@ def measDis(dur):
 
     print('Measurement done')
     return dat
+
+def measGyro(dur):
+    ## Begin of (gyro&accel) measurement code
+    # Start ranging
+    sensor = mpu6050(0x68)
+
+    print('Taking new measurement...')
+    Ts = 0.001
+    
+    for count in range(1,(100)):
+        gyro_data = sensor.get_gyro_data()
+        accl_data = sensor.get_accel_data()
+    
+        print ("Gyro %d, Accel %d" % (gyro_data, accl_data))
+
+        time.sleep(Ts)
+
+    print('Measurement done')
+    return [gyro_data,accl_data]
 
 def plotDis(dis):
     print('Printing distance measurement onto terminal...')
